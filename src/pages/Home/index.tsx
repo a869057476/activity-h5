@@ -27,7 +27,7 @@ const arr = list.map(e => {
   const obj = {
     ...e,
     value: '',
-    status: true
+    status: ''
   }
   return obj
 })
@@ -73,7 +73,7 @@ const Home = () => {
       setstate(prevState => {
         prevState = prevState.map(e => {
           if (e.id === item.id) {
-            e.status = true
+            e.status = ''
             e.value = value
           }
           return e
@@ -190,7 +190,7 @@ const Home = () => {
                         }}
                       />
                     </td>
-                    <td className='status'>{item.status ? '未兑换' : '已兑换'}</td>
+                    <td className='status'>{item.status === '' ? '' : (item.status ? '未兑换' : '已兑换')}</td>
                     <td className='search'>
                       <Button 
                         onClick={() => {

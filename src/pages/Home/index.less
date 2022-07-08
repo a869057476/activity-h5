@@ -42,8 +42,14 @@
 				margin-top: 40px;
 				table {
 					width: 100%;
-					border-top: 1px solid #9099EC;
-					border-left: 1px solid #9099EC;
+					border: 1px solid #9099EC;
+					tr {
+						th, td {
+							&:last-child {
+								border-right: none;
+							}
+						}
+					}
 					th, td {
 						border-bottom: 1px solid #9099EC;
 						border-right: 1px solid #9099EC;
@@ -132,33 +138,39 @@
 				font-size: 32px;
 				color: #fff;
 			}
-			.assets-search {
-				height: 64px;
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				background-color: #302D50;
-				border-radius: 44px;
-				padding: 0 10px 0 30px;
-				.adm-input-element {
-					font-size: 24px;
-					color: rgba(255,255,255,0.8000);
-				}
-				.adm-button {
-					height: 48px;
-					&.search {
-						padding: 5px 20px;
-						white-space: nowrap;
+			.adm-modal-content {
+				.assets-search {
+					margin-top: 20px;
+					height: 64px;
+					display: flex;
+					justify-content: space-between;
+					align-items: center;
+					background-color: #302D50;
+					border-radius: 44px;
+					padding: 0 10px 0 30px;
+					.adm-input-element {
+						font-size: 24px;
+						color: rgba(255,255,255,0.8000);
 					}
+					.adm-button {
+						height: 48px;
+						&.search {
+							padding: 5px 20px;
+							white-space: nowrap;
+						}
+					}
+					
 				}
-				
+				.tip {
+					margin-top: 20px;
+					font-size: 20px;
+					color: #ffffff80;
+					text-align: center;
+					height: 30px;
+				}
 			}
-			.tip {
-				margin-top: 20px;
-				font-size: 20px;
-				color: #ffffff80;
-				text-align: center;
-				height: 30px;
+			.adm-modal-footer.adm-space {
+				border-top: 1px solid rgba(255, 255, 255, 0.1);
 			}
 		}
 	}

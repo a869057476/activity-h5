@@ -15,15 +15,23 @@ service.interceptors.response.use(
     const res = response.data
 
     // if the custom code is not 20000, it is judged as an error.
-    if (response.status !== 200) {
+    if (res?.errorCode !== 200) {
 			Toast.show({
 				icon: 'fail',
-				content: response.message || 'Error',
+				content: res.message || 'Error',
 			})
 
-      return Promise.reject(new Error(response.statusText || 'Error'))
+      return Promise.reject(new Error(res.message || 'Error'))
     } else {
-      return res
+      if (res?.data?.error){
+        Toast.show({
+          icon: 'fail',
+          content: res?.data?.description || 'Error',
+        })
+  
+        return Promise.reject(new Error(res?.data?.description || 'Error'))
+      }
+      return res?.data
     }
   },
   error => {

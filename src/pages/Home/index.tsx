@@ -12,14 +12,22 @@ import './index.less';
 import activityApi from "@/api/activity_api";
 import {list} from './list';
 import mainTitleImg from '@/assets/images/index/main-title.png';
-import { Input, Button, Modal, Toast } from 'antd-mobile'
+import { Input, Button, Modal, Toast, Picker } from 'antd-mobile'
 import { DownFill } from 'antd-mobile-icons'
 
+const typeList = [
+  [
+    { 
+      label: '行者令', 
+      value: '行者令' 
+    }
+  ],
+]
 const arr = list.map(e => {
   const obj = {
     ...e,
     value: '',
-    status: ''
+    status: true
   }
   return obj
 })
@@ -33,6 +41,9 @@ const Home = () => {
   const [modalValue, setValue] = useState('')
   const [modalVisible, setVisible] = useState(false)
   const [result, setResult] = useState('')
+
+  const [typeVisible, setTypeVisible] = useState(false)
+  const [typeValue, setTypeValue] = useState<(string | null)[]>(['行者令'])
   // 单行查询
   const handleClickRow = useCallback(
     (item) => {
@@ -41,25 +52,17 @@ const Home = () => {
         userId: userId,
         zhash: item.value
       }
-      activityApi.queryTokens(params).then(res => {
+      activityApi.queryTokens(params).then((res: any) => {
         console.log('queryTokens', res)
-        if (res?.data?.result) {
-          setstate(prevState => {
-            prevState = prevState.map(e => {
-              if (e.id === item.id) {
-                e.status = res?.data?.result
-              }
-              return e
-            })
-            return prevState
+        setstate(prevState => {
+          prevState = prevState.map(e => {
+            if (e.id === item.id) {
+              e.status = res?.result
+            }
+            return e
           })
-        } else {
-          Toast.show({
-            icon: 'fail',
-            content: res?.data?.description,
-          })
-        }
-        
+          return prevState
+        })
       })
     },
     [userId],
@@ -70,7 +73,7 @@ const Home = () => {
       setstate(prevState => {
         prevState = prevState.map(e => {
           if (e.id === item.id) {
-            e.status = false
+            e.status = true
             e.value = value
           }
           return e
@@ -103,9 +106,9 @@ const Home = () => {
         userId: userId,
         zhash: modalValue
       }
-      activityApi.exchange(params).then(res => {
+      activityApi.exchange(params).then((res: any) => {
         console.log('exchange', res)
-        setResult(res)
+        setResult(res?.result)
       })
     },
     [userId, modalValue],
@@ -124,17 +127,17 @@ const Home = () => {
         name: '行者令',
         userId: userId
       }
-      activityApi.redeemTokens(params).then((res) => {
+      activityApi.redeemTokens(params).then((res: any) => {
         console.log('redeemTokens', res)
-        if (res?.data?.result) {
+        if (res?.result) {
           Toast.show({
             icon: 'success',
-            content: res?.data?.description,
+            content: res?.description,
           })
         } else {
           Toast.show({
             icon: 'fail',
-            content: res?.data?.description,
+            content: res?.description,
           })
         }
       })
@@ -153,6 +156,9 @@ const Home = () => {
               fill='outline' 
               size="small" 
               shape='rounded'
+              onClick={() => {
+                setTypeVisible(true);
+              }}
             >
               行者令<DownFill />
             </Button>
@@ -184,7 +190,7 @@ const Home = () => {
                         }}
                       />
                     </td>
-                    <td className='status'>{item.status ? '已兑换' : '未兑换'}</td>
+                    <td className='status'>{item.status ? '未兑换' : '已兑换'}</td>
                     <td className='search'>
                       <Button 
                         onClick={() => {
@@ -284,10 +290,22 @@ const Home = () => {
               </Button> 
             </div>
             <div className='tip'>
-              {result === '' ? '' : `-该资产${result ? '已兑换' : '未兑换'}-`}
+              {result === '' ? '' : `-该资产${result ? '未兑换' : '已兑换'}-`}
             </div>
           </>
         )}
+      />
+      <Picker
+        columns={typeList}
+        visible={typeVisible}
+        onClose={() => {
+          setTypeVisible(false)
+        }}
+        value={typeValue}
+        onConfirm={v => {
+          setTypeValue(v)
+          setTypeVisible(false)
+        }}
       />
     </div>
   );

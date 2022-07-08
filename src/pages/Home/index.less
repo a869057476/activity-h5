@@ -1,0 +1,122 @@
+.bg {
+	color: #fff;
+	width: 750px;
+	height: 2600px;
+	background: url(@/assets/images/index/bg.png);
+	background-repeat: no-repeat;
+	background-size: cover;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	.main-wrap {
+		position: relative;
+		margin: 1200px 0 0;
+		width: 700px;
+		border: 5px solid #6961FF;
+		border-radius: 10px;
+		.title {
+			position: absolute;
+			left: 50%;
+			top: -38px;
+			transform: translateX(-50%);
+			width: 526px;
+			height: 102px;
+		}
+		.body {
+			padding: 100px 20px 40px;
+			.type-wrap {
+				font-size: 28px;
+				display: flex;
+				align-items: center;
+				.adm-button {
+					margin-left: 20px;
+					color: #fff;
+					opacity: 1;
+					border-color: #9099EC;
+					svg {
+						margin-left: 10px;
+					}
+				}
+			}
+			.table-wrap {
+				margin-top: 40px;
+				table {
+					width: 100%;
+					border-top: 1px solid #9099EC;
+					border-left: 1px solid #9099EC;
+					th, td {
+						border-bottom: 1px solid #9099EC;
+						border-right: 1px solid #9099EC;
+						padding: 10px;
+						text-align: center;
+						font-weight: normal;
+						&.name {
+							width: 180px;
+						}
+						&.hash {
+							width: 180px;
+						}
+						&.status {
+							width: 80px;
+						}
+						&.search {
+							width: 100px;
+						}
+					}
+					td {
+						.adm-input-element {
+							color: #fff;
+							font-size: 12px;
+						}
+						.search {
+							padding: 3px 20px;
+							&.adm-button-disabled {
+								background-color: #343152;
+								border-color: #343152;
+								opacity: 1;
+								color: #908EA0;
+							}
+						}
+					}
+					tr {
+						display: table;
+						width: 100%;
+						table-layout: fixed;
+					}
+					tbody {
+						height: 500px;
+						overflow-y: auto;
+						display: block;
+					}
+				}
+			}
+		}
+	}
+	.btn-wrap {
+		width: 500px;
+		margin-top: 50px;
+		.one {
+			height: 80px;
+			background: #F04155;
+			border: 1px solid #F04155;
+		}
+		.two {
+			height: 80px;
+			margin-top: 30px;
+			background: #34314A;
+			border: 1px solid #FF7463;
+		}
+	}
+	.rule-wrap {
+		width: 700px;
+		margin: 50px auto 0;
+		padding: 0 30px 20px;
+		background: #2A2649;
+		box-sizing: border-box;
+		border-radius: 10px;
+		letter-spacing: 2px;
+		div {
+			margin-bottom: 8px;
+		}
+	}
+}

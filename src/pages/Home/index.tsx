@@ -9,34 +9,60 @@
 import { memo, useCallback, useState } from 'react';
 // import LoadingView from '../../components/LoadingView';
 import './index.less';
+import activityApi from "@/api/activity_api";
 import {list} from './list';
 import mainTitleImg from '@/assets/images/index/main-title.png';
-import { Input, Button, Dialog } from 'antd-mobile'
+import { Input, Button, Modal, Toast } from 'antd-mobile'
 import { DownFill } from 'antd-mobile-icons'
 
 const arr = list.map(e => {
-  e.value = ''
-  e.status = false
-  return e
+  const obj = {
+    ...e,
+    value: '',
+    status: ''
+  }
+  return obj
 })
 const Home = () => {
+  const queryParams = new URLSearchParams(window.location.search);
+  const userId = queryParams.get('userId');
+  console.log('userId', userId)
   const [state, setstate] = useState(
     arr,
   );
+  const [modalValue, setValue] = useState('')
+  const [modalVisible, setVisible] = useState(false)
+  const [result, setResult] = useState('')
+  // 单行查询
   const handleClickRow = useCallback(
     (item) => {
-      console.log(state)
-      setstate(prevState => {
-        prevState = prevState.map(e => {
-          if (e.id === item.id) {
-            e.status = true
-          }
-          return e
-        })
-        return prevState
+      const params = {
+        mhash: item.id,
+        userId: userId,
+        zhash: item.value
+      }
+      activityApi.queryTokens(params).then(res => {
+        console.log('queryTokens', res)
+        if (res?.data?.result) {
+          setstate(prevState => {
+            prevState = prevState.map(e => {
+              if (e.id === item.id) {
+                e.status = res?.data?.result
+              }
+              return e
+            })
+            return prevState
+          })
+        } else {
+          Toast.show({
+            icon: 'fail',
+            content: res?.data?.description,
+          })
+        }
+        
       })
     },
-    [state],
+    [userId],
   );
   const handleInputRow = useCallback(
     (value, item) => {
@@ -69,6 +95,53 @@ const Home = () => {
     },
     [state],
   );
+  // 资产查询
+  const handleSearchResult = useCallback(
+    () => {
+      const params = {
+        mhash: '',
+        userId: userId,
+        zhash: modalValue
+      }
+      activityApi.exchange(params).then(res => {
+        console.log('exchange', res)
+        setResult(res)
+      })
+    },
+    [userId, modalValue],
+  );
+  // 立即兑换
+  const handleExchange = useCallback(
+    () => {
+      const arr = JSON.parse(JSON.stringify(state)).map((item: { id: any; }) => {
+        const obj = {
+          mhash: item.id
+        }
+        return obj
+      })
+      const params = {
+        list: arr,
+        name: '行者令',
+        userId: userId
+      }
+      activityApi.redeemTokens(params).then((res) => {
+        console.log('redeemTokens', res)
+        if (res?.data?.result) {
+          Toast.show({
+            icon: 'success',
+            content: res?.data?.description,
+          })
+        } else {
+          Toast.show({
+            icon: 'fail',
+            content: res?.data?.description,
+          })
+        }
+      })
+    },
+    [state, userId],
+  );
+  console.log('init')
   return (
     <div className="bg">
       <div className="main-wrap">
@@ -134,7 +207,15 @@ const Home = () => {
         </div> 
       </div> 
       <div className='btn-wrap'>
-        <Button block shape='rounded' color='primary' className='one'>
+        <Button 
+          block 
+          shape='rounded' 
+          color='primary' 
+          className='one'
+          onClick={() => {
+            handleExchange()
+          }}
+        >
           立即兑换
         </Button> 
         <Button 
@@ -143,17 +224,9 @@ const Home = () => {
           color='primary' 
           className='two'
           onClick={() => {
-            Dialog.confirm({
-              title: '资产查询',
-              content: (
-                <>
-                  <div>请用手机拍摄手持工牌照，注意保持照片清晰</div>
-                  <div>
-                    详情说明请查阅<a>操作指引</a>
-                  </div>
-                </>
-              )
-            })
+            setValue('')
+            setResult('')
+            setVisible(true)
           }}
         >
           资产查询
@@ -165,6 +238,57 @@ const Home = () => {
         <div>2、发行数量当期9个作品中，已售份数最少的藏品为准，每一份藏品仅可组合一次。</div>
         <div>3、任务类：限量1000份，结合日常平台任务和要求发放。</div>
       </div>
+      <Modal
+        visible={modalVisible}
+        title="资产查询"
+        bodyClassName="my-modal"
+        destroyOnClose
+        showCloseButton
+        closeOnAction
+        onClose={() => {
+          setVisible(false)
+        }}
+        actions={[
+          {
+            key: 'cancel',
+            text: '取消',
+          },
+        ]}
+        content={(
+          <>
+            <div className='assets-search'>
+              <Input 
+                placeholder='请输入您要查询的ID'
+                value={modalValue} 
+                clearable
+                onChange={(value) => {
+                  setValue(value)
+                  setResult('')
+                }}
+                onClear={() => {
+                  setValue('');
+                  setResult('')
+                }}
+              />
+              <Button 
+                shape='rounded' 
+                color='primary' 
+                className='search'
+                disabled={modalValue === ''} 
+                size="mini"
+                onClick={() => {
+                  handleSearchResult();
+                }}
+                >
+                查询
+              </Button> 
+            </div>
+            <div className='tip'>
+              {result === '' ? '' : `-该资产${result ? '已兑换' : '未兑换'}-`}
+            </div>
+          </>
+        )}
+      />
     </div>
   );
 };

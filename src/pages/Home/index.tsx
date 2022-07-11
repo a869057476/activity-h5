@@ -57,7 +57,7 @@ const Home = () => {
         setstate(prevState => {
           prevState = prevState.map(e => {
             if (e.id === item.id) {
-              e.status = res?.result
+              e.status = res.error ? '' : res?.result
             }
             return e
           })

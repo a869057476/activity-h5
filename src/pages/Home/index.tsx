@@ -102,8 +102,6 @@ const Home = () => {
   const handleSearchResult = useCallback(
     () => {
       const params = {
-        mhash: '',
-        userId: userId,
         zhash: modalValue
       }
       activityApi.exchange(params).then((res: any) => {

@@ -18,8 +18,8 @@ import { DownFill } from 'antd-mobile-icons'
 const typeList = [
   [
     { 
-      label: '行者令', 
-      value: '行者令' 
+      label: '甲·行者令', 
+      value: '甲·行者令' 
     }
   ],
 ]
@@ -43,7 +43,7 @@ const Home = () => {
   const [result, setResult] = useState('')
 
   const [typeVisible, setTypeVisible] = useState(false)
-  const [typeValue, setTypeValue] = useState<(string | null)[]>(['行者令'])
+  const [typeValue, setTypeValue] = useState<(string | null)[]>(['甲·行者令'])
   // 单行查询
   const handleClickRow = useCallback(
     (item) => {
@@ -89,6 +89,7 @@ const Home = () => {
       setstate(prevState => {
         prevState = prevState.map(e => {
           if (e.id === item.id) {
+            e.status = ''
             e.value = ''
           }
           return e
@@ -109,20 +110,22 @@ const Home = () => {
         setResult(res?.result)
       })
     },
-    [userId, modalValue],
+    [modalValue],
   );
   // 立即兑换
   const handleExchange = useCallback(
     () => {
-      const arr = JSON.parse(JSON.stringify(state)).map((item: { id: any; }) => {
+      const arr = JSON.parse(JSON.stringify(state)).map((item: { id: any; value: any; status: any }) => {
         const obj = {
-          mhash: item.id
+          mhash: item.id,
+          zhash: item.value
         }
+        console.log('status start log', item.status, 'status end log')
         return obj
       })
       const params = {
         list: arr,
-        name: '行者令',
+        name: '甲·行者令',
         userId: userId
       }
       activityApi.redeemTokens(params).then((res: any) => {
@@ -158,7 +161,7 @@ const Home = () => {
                 setTypeVisible(true);
               }}
             >
-              行者令<DownFill />
+              甲·行者令<DownFill />
             </Button>
           </div>
           <div className='table-wrap'>

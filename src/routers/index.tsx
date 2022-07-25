@@ -8,13 +8,13 @@
  */
 import { White } from '@/typings';
 import { lazy } from 'react';
-const Search = lazy(() => import(/* chunkName: "Search" */ '@/pages/Search'));
-const List = lazy(() => import(/* chunkName: List */ '@/pages/List'));
+// const Search = lazy(() => import(/* chunkName: "Search" */ '@/pages/Search'));
+// const List = lazy(() => import(/* chunkName: List */ '@/pages/List'));
 const Home = lazy(() => import(/* chunkName: Home */ '@/pages/Home'));
-const Detail = lazy(() => import(/* chunkName: Detail */ '@/pages/Detail'));
+// const Detail = lazy(() => import(/* chunkName: Detail */ '@/pages/Detail'));
 const Index = lazy(() => import(/* chunkName: Index */ '@/pages/Index'));
-const Other = lazy(() => import(/* chunkName: Other */ '@/pages/Other'));
-const Other1 = lazy(() => import(/* chunkName: Other1 */ '@/pages/Other1'));
+// const Other = lazy(() => import(/* chunkName: Other */ '@/pages/Other'));
+// const Other1 = lazy(() => import(/* chunkName: Other1 */ '@/pages/Other1'));
 const NoFound = lazy(
   () => import(/* chunkName: NoFound */ '../components/NoFound'),
 );
@@ -26,27 +26,27 @@ export const TabBarList: White.RouteTabBar[] = [
     sceneMode: 'scroll',
     title: '首页',
   },
-  {
-    path: '/detail',
-    component: Detail,
-    icon: 'white-tradingdata',
-    sceneMode: 'scroll',
-    title: '详情',
-  },
-  {
-    path: '/list',
-    component: List,
-    icon: 'white-order',
-    sceneMode: 'scroll',
-    title: '统计',
-  },
-  {
-    path: '/search',
-    component: Search,
-    icon: 'white-account',
-    sceneMode: 'scroll',
-    title: '我的',
-  },
+  // {
+  //   path: '/detail',
+  //   component: Detail,
+  //   icon: 'white-tradingdata',
+  //   sceneMode: 'scroll',
+  //   title: '详情',
+  // },
+  // {
+  //   path: '/list',
+  //   component: List,
+  //   icon: 'white-order',
+  //   sceneMode: 'scroll',
+  //   title: '统计',
+  // },
+  // {
+  //   path: '/search',
+  //   component: Search,
+  //   icon: 'white-account',
+  //   sceneMode: 'scroll',
+  //   title: '我的',
+  // },
 ];
 
 const routes: White.RouteConfig[] = [
@@ -55,19 +55,19 @@ const routes: White.RouteConfig[] = [
     component: Index,
     tabBars: TabBarList,
   },
-  {
-    path: '/other',
-    component: Other,
-  },
-  {
-    path: '/other1',
-    sceneMode: 'bottom',
-    component: Other1,
-  },
-  {
-    path: '/dcotorDetail',
-    component: Detail,
-  },
+  // {
+  //   path: '/other',
+  //   component: Other,
+  // },
+  // {
+  //   path: '/other1',
+  //   sceneMode: 'bottom',
+  //   component: Other1,
+  // },
+  // {
+  //   path: '/dcotorDetail',
+  //   component: Detail,
+  // },
   {
     path: '*',
     component: NoFound,

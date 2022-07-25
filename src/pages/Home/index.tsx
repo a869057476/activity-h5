@@ -6,57 +6,135 @@
  * @LastEditors: 小白
  * @LastEditTime: 2022-02-16 22:43:05
  */
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useState, useEffect } from 'react';
 // import LoadingView from '../../components/LoadingView';
 import './index.less';
 import activityApi from "@/api/activity_api";
-import {list} from './list';
 import mainTitleImg from '@/assets/images/index/main-title.png';
 import { Input, Button, Modal, Toast, Picker } from 'antd-mobile'
 import { DownFill } from 'antd-mobile-icons'
 
-const typeList = [
-  [
-    { 
-      label: '甲·行者令', 
-      value: '甲·行者令' 
-    }
-  ],
-]
-const arr = list.map(e => {
-  const obj = {
-    ...e,
-    value: '',
-    status: ''
-  }
-  return obj
-})
+interface IState {
+  zpname: string;
+  value: string;
+  mhash: string;
+  status: string | boolean;
+}
+// const firstTypeList = [
+//   { 
+//     label: '甲·行者令', 
+//     value: '甲·行者令' 
+//   },
+//   { 
+//     label: '乙·行者令', 
+//     value: '乙·行者令' 
+//   }
+// ]
+// const typeList = [
+//   firstTypeList
+// ]
+const tempTypeValue = window.localStorage.getItem('tempTypeValue') || ''
 const Home = () => {
   const queryParams = new URLSearchParams(window.location.search);
   const userId = queryParams.get('userId');
   console.log('userId', userId)
-  const [state, setstate] = useState(
-    arr,
-  );
+
+  const [loading, setLoading] = useState(true)
+  const [state, setstate] = useState<IState[]>([]);
   const [modalValue, setValue] = useState('')
   const [modalVisible, setVisible] = useState(false)
   const [result, setResult] = useState('')
 
   const [typeVisible, setTypeVisible] = useState(false)
-  const [typeValue, setTypeValue] = useState<(string | null)[]>(['甲·行者令'])
+  const [typeValue, setTypeValue] = useState<(string | null)[]>([])
+  const [typeList, setTypeList] = useState([[]])
+
+  // 缓存用户输入的子hash和查询的状态
+  useEffect(() => {
+    console.log(111)
+    if (!loading) {
+      console.log(111222)
+      const tempState = JSON.parse(window.localStorage.getItem('tempState') || '[]')
+      const tempStateCopy = JSON.parse(JSON.stringify(tempState))
+      state.forEach(e => {
+        const findIndex = tempStateCopy.findIndex((t: { mhash: string; }) => t.mhash === e.mhash)
+        if (findIndex > -1) {
+          tempStateCopy[findIndex].value = e.value
+          tempStateCopy[findIndex].status = e.status
+        } else {
+          tempStateCopy.push(e)
+        }
+      })
+      window.localStorage.setItem('tempState', JSON.stringify(tempStateCopy))
+    }
+  }, [state, loading]);
+
+  // 缓存选择的令牌类型
+  useEffect(() => {
+    console.log(222)
+    window.localStorage.setItem('tempTypeValue', typeValue.toString())
+  }, [typeValue]);
+
+  // 请求列表数据并加载缓存
+  useEffect(() => {
+    console.log(333)
+    const tempState = JSON.parse(window.localStorage.getItem('tempState') || '[]')
+    const getList = () => {
+      const params = {
+        name: typeValue.toString()
+      }
+      activityApi.queryZpnameAndMhash(params).then((res: any) => {
+        setstate(prevState => {
+          prevState = res.map((e: any) => {
+            const obj = {
+              ...e,
+              value: '',
+              status: ''
+            }
+            const node = tempState.find((item: { mhash: any; }) => item.mhash === e.mhash)
+            if (node) {
+              obj.value = node.value
+              obj.status = node.status
+            }
+            return obj
+          })
+          return prevState
+        })
+        setLoading(false)
+      })
+    };
+    if (typeValue.length > 0) {
+      getList();
+    }
+  }, [typeValue]);
+
+  // 获取令牌类型
+  useEffect(() => {
+    console.log(444)
+    const getList = () => {
+      activityApi.queryTokenName().then((res: any) => {
+        // res = [...res, '333']
+        setTypeList([res])
+        const tempTypeValueNode = res.find((e: string) => e === tempTypeValue)
+        const defaultValue: string = tempTypeValueNode ? tempTypeValue : res[0]
+        setTypeValue([defaultValue])
+      })
+    };
+    getList();
+  }, []);
+
   // 单行查询
   const handleClickRow = useCallback(
     (item) => {
       const params = {
-        mhash: item.id,
+        mhash: item.mhash,
         userId: userId,
         zhash: item.value
       }
       activityApi.queryTokens(params).then((res: any) => {
-        console.log('queryTokens', res)
         setstate(prevState => {
           prevState = prevState.map(e => {
-            if (e.id === item.id) {
+            if (e.mhash === item.mhash) {
               e.status = res.error ? '' : res?.result
             }
             return e
@@ -69,10 +147,9 @@ const Home = () => {
   );
   const handleInputRow = useCallback(
     (value, item) => {
-      console.log(state)
       setstate(prevState => {
         prevState = prevState.map(e => {
-          if (e.id === item.id) {
+          if (e.mhash === item.mhash) {
             e.status = ''
             e.value = value
           }
@@ -81,14 +158,13 @@ const Home = () => {
         return prevState
       })
     },
-    [state],
+    [],
   );
   const handleClearRow = useCallback(
     (item) => {
-      console.log(state)
       setstate(prevState => {
         prevState = prevState.map(e => {
-          if (e.id === item.id) {
+          if (e.mhash === item.mhash) {
             e.status = ''
             e.value = ''
           }
@@ -97,7 +173,7 @@ const Home = () => {
         return prevState
       })
     },
-    [state],
+    [],
   );
   // 资产查询
   const handleSearchResult = useCallback(
@@ -106,7 +182,6 @@ const Home = () => {
         zhash: modalValue
       }
       activityApi.exchange(params).then((res: any) => {
-        console.log('exchange', res)
         setResult(res?.result)
       })
     },
@@ -115,12 +190,11 @@ const Home = () => {
   // 立即兑换
   const handleExchange = useCallback(
     () => {
-      const arr = JSON.parse(JSON.stringify(state)).map((item: { id: any; value: any; status: any }) => {
+      const arr = JSON.parse(JSON.stringify(state)).map((item: { mhash: any; value: any; status: any }) => {
         const obj = {
-          mhash: item.id,
+          mhash: item.mhash,
           zhash: item.value
         }
-        console.log('status start log', item.status, 'status end log')
         return obj
       })
       const params = {
@@ -129,7 +203,6 @@ const Home = () => {
         userId: userId
       }
       activityApi.redeemTokens(params).then((res: any) => {
-        console.log('redeemTokens', res)
         if (res?.result) {
           Toast.show({
             icon: 'success',
@@ -145,7 +218,6 @@ const Home = () => {
     },
     [state, userId],
   );
-  console.log('init')
   return (
     <div className="bg">
       <div className="main-wrap">
@@ -161,7 +233,7 @@ const Home = () => {
                 setTypeVisible(true);
               }}
             >
-              甲·行者令<DownFill />
+              {typeValue.toString()}<DownFill />
             </Button>
           </div>
           <div className='table-wrap'>
@@ -175,9 +247,9 @@ const Home = () => {
                 </tr>
               </thead>
               <tbody>
-                {arr?.map((item, index) => (
-                  <tr key={item.id}>
-                    <td className='name'>{item.name}</td>
+                {state?.map((item, index) => (
+                  <tr key={item.mhash}>
+                    <td className='name'>{item.zpname}</td>
                     <td className='hash'>
                       <Input 
                         placeholder='请输入哈希令' 

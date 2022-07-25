@@ -1,5 +1,14 @@
 import request from '@/utils/request'
 
+// 获取令牌类型
+export function queryTokenName(data) {
+	return request({
+		url: '/api/h5/assets/queryTokenName',
+		method: 'post',
+		data
+	})
+}
+
 // 通过令牌查询包含的作品名称和mhash
 export function queryZpnameAndMhash(data) {
 	return request({
@@ -37,6 +46,7 @@ export function redeemTokens(data) {
 }
 
 export default {
+	queryTokenName,
 	queryZpnameAndMhash,
 	exchange,
 	queryTokens,

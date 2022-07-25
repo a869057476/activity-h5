@@ -1,6 +1,6 @@
 import '@/assets/css/common.less';
 import 'lib-flexible';
-import { StrictMode } from 'react';
+// import { StrictMode } from 'react';
 import { render } from 'react-dom';
 import { GlobalProvider } from 'rmox';
 import App from './App';
@@ -10,10 +10,13 @@ window.onresize = () => {
   setWindowHeight();
 };
 render(
-  <StrictMode>
-    <GlobalProvider>
-      <App />
-    </GlobalProvider>
-  </StrictMode>,
+  // <StrictMode>
+  //   <GlobalProvider>
+  //     <App />
+  //   </GlobalProvider>
+  // </StrictMode>,
+  // <GlobalProvider>
+    <App />,
+  // </GlobalProvider>,
   document.getElementById('root'),
 );
